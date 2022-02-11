@@ -30,7 +30,7 @@ project {
 }
 
 object B : BuildType({
-    name = "b"
+    name = "bc"
 
     vcs {
         root(DslContext.settingsRoot)
