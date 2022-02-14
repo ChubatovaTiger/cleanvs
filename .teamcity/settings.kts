@@ -24,9 +24,82 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 
 version = "2021.2"
 
+fun ProjectFeatures.addGraphs(buildTypeList : List<BuildType>) {
+    buildTypeList.forEach {
+        feature {
+            type = "project-graphs"
+            param(
+                "series", """
+                    [
+                      {
+                        "type": "valueType",
+                        "title": "Time spent in queue",
+                        "sourceBuildTypeId": ${it.id},
+                        "key": "TimeSpentInQueue"
+                      },
+                      {
+                        "type": "valueType",
+                        "title": "Build duration",
+                        "sourceBuildTypeId": ${it.id},
+                        "key": "BuildDuration"
+                      }
+                    ]
+                """.trimIndent()
+            )
+            param("format", "duration")
+            param("hideFilters", "")
+            param("title", "Time spent overall ${it.name}")
+            param("defaultFilters", "showFailed")
+            param("seriesTitle", "Serie")
+        }
+        feature {
+            type = "project-graphs"
+            param(
+                "series", """
+                    [
+                      {
+                        "type": "valueType",
+                        "title": "Success Rate for ${it.name}",
+                        "sourceBuildTypeId": ${it.id},
+                        "key": "SuccessRate"
+                      }
+                    ]
+                """.trimIndent()
+            )
+            param("format", "percentBy1")
+            param("hideFilters", "")
+            param("title", "Success Rate for ${it.name}")
+            param("defaultFilters", "showFailed, averaged")
+            param("seriesTitle", "Serie")
+        }
+    }
+    feature {
+        type = "buildtype-graphs"
+        param(
+            "series", """
+                    [
+                      {
+                        "type": "valueTypes",
+                        "pattern": "buildStageDuration:*",
+                        "title": "Stage: {1}"
+                      }
+                    ]
+            """.trimIndent()
+        )
+        param("format", "duration")
+        param("hideFilters", "")
+        param("title", "Time per step")
+        param("defaultFilters", "showFailed")
+        param("seriesTitle", "Serie")
+    }
+}
+
 project {
 
     buildType(B)
+    features {
+    addGraphs(buildChain.buildTypes())
+}
 }
 
 object B : BuildType({
